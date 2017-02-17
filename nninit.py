@@ -5,8 +5,8 @@ def uniform(tensor, a=0, b=1):
     return tensor.uniform_(a, b)
 
 
-def normal(tensor, mean=0, var=1):
-    return tensor.normal_(mean=mean, var=var)
+def normal(tensor, mean=0, std=1):
+    return tensor.normal_(mean, std)
 
 
 def constant(tensor, val):
