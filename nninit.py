@@ -14,24 +14,25 @@ def constant(tensor, val):
 
 
 def _calculate_fan_in_and_fan_out(tensor):
+    if len(tensor.size()) < 2:
+        raise ValueError("fan in and fan out can not be computed for tensor of size ", tensor.size())
+
     if len(tensor.size()) == 2: # Linear
         fan_in = tensor.size(1)
         fan_out = tensor.size(0)
-    elif len(tensor.size()) == 4: # Conv2D
+    else:
         num_input_fmaps = tensor.size(1)
         num_output_fmaps = tensor.size(0)
-        kernel_height = tensor.size(2)
-        kernel_width = tensor.size(3)
-        fan_in = num_input_fmaps * kernel_height * kernel_width
-        fan_out = num_output_fmaps * kernel_height * kernel_width
-    else:
-        raise ValueError("fan in and fan out can not be computed for tensor of size ", tensor.size())
+        receptive_field_size = np.prod(tensor.numpy().shape[2:])
+        fan_in = num_input_fmaps * receptive_field_size
+        fan_out = num_output_fmaps * receptive_field_size
+
     return fan_in, fan_out
 
 
 def xavier_uniform(tensor, gain=1):
     fan_in, fan_out = _calculate_fan_in_and_fan_out(tensor)
-    std = gain * np.sqrt(2.0/ (fan_in + fan_out))
+    std = gain * np.sqrt(2.0 / (fan_in + fan_out))
     a = np.sqrt(3.0) * std
     return tensor.uniform_(-a, a)
 

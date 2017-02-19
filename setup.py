@@ -6,4 +6,4 @@ setup(name="nninit",
       description="initialization schemes for the PyTorch nn package",
       version="0.1",
       url="https://github.com/alykhantejani/nninit",
-      py_modules=["nninit"])
+      py_modules=["nninit"], requires=['torch', 'numpy', 'pytest', 'scipy'])
