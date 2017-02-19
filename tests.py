@@ -6,7 +6,8 @@ import numpy as np
 from scipy import stats
 
 
-# TODO: set random seed at beggining of tests
+np.random.seed(123)
+torch.manual_seed(123)
 
 
 def _random_float(a, b):
@@ -20,19 +21,16 @@ def _create_random_nd_tensor(dims, size_min, size_max):
 
 def _is_uniform(data, a, b):
     p_value = stats.kstest(data.flatten(), 'uniform', args=(a, (b - a))).pvalue
-    return p_value > 0.05
+    return p_value > 0.01
 
 
 def _is_normal(data, mean, std):
     p_value = stats.kstest(data.flatten(), 'norm', args=(mean, std)).pvalue
-    return p_value > 0.05
+    return p_value > 0.01
 
 
 @mark.parametrize("dims", [1, 2, 4])
 def test_uniform(dims):
-    np.random.seed(123)
-    torch.manual_seed(123)
-
     input_tensor = _create_random_nd_tensor(dims, size_min=30, size_max=50)
     a = _random_float(-3, 3)
     b = a + _random_float(1, 5)
@@ -43,9 +41,6 @@ def test_uniform(dims):
 
 @mark.parametrize("dims", [1, 2, 4])
 def test_normal(dims):
-    np.random.seed(123)
-    torch.manual_seed(123)
-
     input_tensor = _create_random_nd_tensor(dims, size_min=30, size_max=50)
     mean = _random_float(-3, 3)
     std = _random_float(1, 5)
@@ -60,3 +55,24 @@ def test_constant(dims):
     val = _random_float(1, 10)
     nninit.constant(input_tensor, val)
     assert np.allclose(input_tensor.numpy(), input_tensor.clone().fill_(val).numpy())
+
+
+@mark.parametrize("use_gain", [True, False])
+@mark.parametrize("dims", [2, 4])
+def test_xavier_uniform(use_gain, dims):
+    input_tensor = _create_random_nd_tensor(dims, size_min=30, size_max=35)
+    gain = 1
+
+    if use_gain:
+        gain = _random_float(0.1, 2)
+        nninit.xavier_uniform(input_tensor, gain=gain)
+    else:
+        nninit.xavier_uniform(input_tensor)
+
+    tensor_shape = input_tensor.numpy().shape
+    receptive_field = np.prod(tensor_shape[2:])
+    expected_std = gain * np.sqrt(2.0 / ((tensor_shape[1] + tensor_shape[0]) * receptive_field))
+    bounds = expected_std * np.sqrt(3)
+    assert _is_uniform(input_tensor.numpy(), -bounds, bounds)
+    assert np.allclose(input_tensor.std(), expected_std, atol=1e-2)
+
