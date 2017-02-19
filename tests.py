@@ -76,3 +76,22 @@ def test_xavier_uniform(use_gain, dims):
     assert _is_uniform(input_tensor.numpy(), -bounds, bounds)
     assert np.allclose(input_tensor.std(), expected_std, atol=1e-2)
 
+
+@mark.parametrize("use_gain", [True, False])
+@mark.parametrize("dims", [2, 4])
+def test_xavier_normal(use_gain, dims):
+    input_tensor = _create_random_nd_tensor(dims, size_min=30, size_max=35)
+    gain = 1
+
+    if use_gain:
+        gain = _random_float(0.1, 2)
+        nninit.xavier_normal(input_tensor, gain=gain)
+    else:
+        nninit.xavier_normal(input_tensor)
+
+    tensor_shape = input_tensor.numpy().shape
+    receptive_field = np.prod(tensor_shape[2:])
+
+    expected_std = gain * np.sqrt(2.0 / ((tensor_shape[1] + tensor_shape[0]) * receptive_field))
+    assert _is_normal(input_tensor.numpy(), 0, expected_std)
+

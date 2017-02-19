@@ -40,4 +40,4 @@ def xavier_uniform(tensor, gain=1):
 def xavier_normal(tensor, gain=1):
     fan_in, fan_out = _calculate_fan_in_and_fan_out(tensor)
     std = gain * np.sqrt(2.0 / (fan_in + fan_out))
-    return tensor.normal_(mean=0, var=std ** 2)
+    return tensor.normal_(0, std)
