@@ -17,7 +17,7 @@ def _calculate_fan_in_and_fan_out(tensor):
     if len(tensor.size()) < 2:
         raise ValueError("fan in and fan out can not be computed for tensor of size ", tensor.size())
 
-    if len(tensor.size()) == 2: # Linear
+    if len(tensor.size()) == 2:  # Linear
         fan_in = tensor.size(1)
         fan_out = tensor.size(0)
     else:
@@ -39,6 +39,5 @@ def xavier_uniform(tensor, gain=1):
 
 def xavier_normal(tensor, gain=1):
     fan_in, fan_out = _calculate_fan_in_and_fan_out(tensor)
-    std = gain * np.sqrt(2.0/ (fan_in + fan_out))
-    return tensor.normal_(mean=0, var=std**2)
-
+    std = gain * np.sqrt(2.0 / (fan_in + fan_out))
+    return tensor.normal_(mean=0, var=std ** 2)

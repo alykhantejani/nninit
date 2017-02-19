@@ -15,7 +15,7 @@ def _random_float(a, b):
 
 def _create_random_nd_tensor(dims, size_min, size_max):
     size = [randint(size_min, size_max) for _ in range(dims)]
-    return torch.Tensor(size).zero_()
+    return torch.from_numpy(np.ndarray(size)).zero_()
 
 
 def _is_uniform(data, a, b):
