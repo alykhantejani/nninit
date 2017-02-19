@@ -14,10 +14,10 @@ def constant(tensor, val):
 
 
 def _calculate_fan_in_and_fan_out(tensor):
-    if len(tensor.size()) < 2:
+    if tensor.ndimension() < 2:
         raise ValueError("fan in and fan out can not be computed for tensor of size ", tensor.size())
 
-    if len(tensor.size()) == 2:  # Linear
+    if tensor.ndimension() == 2:  # Linear
         fan_in = tensor.size(1)
         fan_out = tensor.size(0)
     else:
@@ -54,3 +54,19 @@ def kaiming_normal(tensor, gain=1):
     fan_in, _ = _calculate_fan_in_and_fan_out(tensor)
     std = gain * np.sqrt(1.0 / fan_in)
     return tensor.normal_(0, std)
+
+
+def sparse(tensor, sparsity, std=0.01):
+    if tensor.ndimension() != 2:
+        raise ValueError("Sparse initialization only supported for 2D inputs")
+    tensor.normal_(0, std)
+    rows, cols = tensor.size(0), tensor.size(1)
+    num_zeros = int(np.ceil(cols * sparsity))
+
+    for col_idx in range(tensor.size(1)):
+        row_indices = np.arange(rows)
+        np.random.shuffle(row_indices)
+        zero_indices = row_indices[:num_zeros]
+        tensor.numpy()[zero_indices, col_idx] = 0
+
+    return tensor
