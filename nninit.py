@@ -43,14 +43,14 @@ def xavier_normal(tensor, gain=1):
     return tensor.normal_(0, std)
 
 
-def he_uniform(tensor, gain=1):
+def kaiming_uniform(tensor, gain=1):
     fan_in, _ = _calculate_fan_in_and_fan_out(tensor)
     std = gain * np.sqrt(1.0 / fan_in)
     a = np.sqrt(3.0) * std
     return tensor.uniform_(-a, a)
 
 
-def he_normal(tensor, gain=1):
+def kaiming_normal(tensor, gain=1):
     fan_in, _ = _calculate_fan_in_and_fan_out(tensor)
     std = gain * np.sqrt(1.0 / fan_in)
     return tensor.normal_(0, std)

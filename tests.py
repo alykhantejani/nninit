@@ -1,4 +1,5 @@
 from pytest import mark
+from pytest import raises
 import nninit
 import torch
 from numpy.random import randint, random_sample
@@ -96,13 +97,29 @@ def test_xavier_normal(use_gain, dims):
     assert _is_normal(input_tensor, 0, expected_std)
 
 
+def test_kaiming_unifrom_errors_on_inputs_smaller_than_1d():
+    with raises(ValueError):
+        nninit.kaiming_uniform(torch.Tensor())
+
+    with raises(ValueError):
+        nninit.kaiming_uniform(torch.Tensor(3))
+
+
+def test_kaiming_normal_errors_on_inputs_smaller_than_1d():
+    with raises(ValueError):
+        nninit.kaiming_normal(torch.Tensor())
+
+    with raises(ValueError):
+        nninit.kaiming_normal(torch.Tensor(3))
+
+
 @mark.parametrize("use_gain", [True, False])
 @mark.parametrize("dims", [2, 4])
-def kaiming_uniform(use_gain, dims):
+def test_kaiming_uniform(use_gain, dims):
     input_tensor = _create_random_nd_tensor(dims, size_min=30, size_max=35)
     tensor_shape = input_tensor.numpy().shape
     receptive_field = np.prod(tensor_shape[2:])
-
+    gain = 1
     if use_gain:
         gain = _random_float(0.1, 2)
         nninit.kaiming_uniform(input_tensor, gain=gain)
@@ -117,11 +134,11 @@ def kaiming_uniform(use_gain, dims):
 
 @mark.parametrize("use_gain", [True, False])
 @mark.parametrize("dims", [2, 4])
-def kaiming_normal(use_gain, dims):
+def test_kaiming_normal(use_gain, dims):
     input_tensor = _create_random_nd_tensor(dims, size_min=30, size_max=35)
     tensor_shape = input_tensor.numpy().shape
     receptive_field = np.prod(tensor_shape[2:])
-
+    gain = 1
     if use_gain:
         gain = _random_float(0.1, 2)
         nninit.kaiming_normal(input_tensor, gain=gain)
