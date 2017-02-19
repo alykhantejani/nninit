@@ -58,6 +58,21 @@ def test_constant(dims):
     assert np.allclose(input_tensor.numpy(), input_tensor.clone().fill_(val).numpy())
 
 
+def test_xavier_uniform_errors_on_inputs_smaller_than_1d():
+    with raises(ValueError):
+        nninit.xavier_uniform(torch.Tensor())
+
+    with raises(ValueError):
+        nninit.xavier_uniform(torch.Tensor(3))
+
+
+def test_xavier_normal_errors_on_inputs_smaller_than_1d():
+    with raises(ValueError):
+        nninit.xavier_normal(torch.Tensor())
+
+    with raises(ValueError):
+        nninit.xavier_normal(torch.Tensor(3))
+
 @mark.parametrize("use_gain", [True, False])
 @mark.parametrize("dims", [2, 4])
 def test_xavier_uniform(use_gain, dims):
