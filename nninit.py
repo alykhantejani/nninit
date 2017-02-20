@@ -71,7 +71,7 @@ def xavier_uniform(tensor, gain=1):
 
     Args:
         tensor: a n-dimension torch.Tensor
-        gain: optional gain to be applied
+        gain: an optional scaling factor to be applied
 
     Examples:
         >>> w = torch.Tensor(3, 5)
@@ -92,7 +92,7 @@ def xavier_normal(tensor, gain=1):
 
     Args:
         tensor: a n-dimension torch.Tensor
-        gain: optional gain to be applied
+        gain: an optional scaling factor to be applied
 
     Examples:
         >>> w = torch.Tensor(3, 5)
@@ -111,7 +111,7 @@ def kaiming_uniform(tensor, gain=1):
 
     Args:
         tensor: a n-dimension torch.Tensor
-        gain: optional gain to be applied
+        gain: an optional scaling factor to be applied
 
     Examples:
         >>> w = torch.Tensor(3, 5)
@@ -132,7 +132,7 @@ def kaiming_normal(tensor, gain=1):
 
     Args:
         tensor: a n-dimension torch.Tensor
-        gain: optional gain to be applied
+        gain: an optional scaling factor to be applied
 
     Examples:
         >>> w = torch.Tensor(3, 5)
@@ -145,6 +145,20 @@ def kaiming_normal(tensor, gain=1):
 
 
 def orthogonal(tensor, gain=1):
+    """Fills the input tensor with a (semi) orthogonal matrix. The input tensor must have at least 2 dimensions, and for 
+    tensors with more than 2 dimensions the trailing dimensions are flattened.
+    viewed as 2D representation with rows equal to the first dimension and columns equal to the product of  as a sparse matrix, where the non-zero elements will be drawn from a normal distribution
+     with mean=0 and std=`std`.
+     Reference: "Exact solutions to the nonlinear dynamics of learning in deep linear neural networks" - Saxe, A. et al.
+
+    Args:
+        tensor: a n-dimension torch.Tensor, where n >= 2
+        gain: optional gain to be applied
+
+    Examples:
+        >>> w = torch.Tensor(3, 5)
+        >>> nninit.orthogonal(w)
+    """
     if tensor.ndimension() < 2:
         raise ValueError("Only tensors with 2 or more dimensions are supported.")
 
@@ -164,7 +178,6 @@ def orthogonal(tensor, gain=1):
 def sparse(tensor, sparsity, std=0.01):
     """Fills the 2D input tensor as a sparse matrix, where the non-zero elements will be drawn from a normal distribution
      with mean=0 and std=`std`.
-     Reference: "Exact solutions to the nonlinear dynamics of learning in deep linear neural networks" - Saxe, A. et al.
 
     Args:
         tensor: a n-dimension torch.Tensor
