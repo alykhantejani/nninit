@@ -1,4 +1,5 @@
 import numpy as np
+import torch
 
 
 def uniform(tensor, a=0, b=1):
@@ -104,7 +105,7 @@ def xavier_normal(tensor, gain=1):
 
 def kaiming_uniform(tensor, gain=1):
     """Fills the input tensor with values according to the method described in "Delving deep into rectifiers: Surpassing
-       human-level performance on ImageNet classification" - He, K. et al using a normal distribution.
+       human-level performance on ImageNet classification" - He, K. et al using a uniform distribution.
 
        The resulting tensor will have values sampled from U(-a, a) where a = gain * sqrt(1/(fan_in))
 
@@ -141,6 +142,23 @@ def kaiming_normal(tensor, gain=1):
     fan_in, _ = _calculate_fan_in_and_fan_out(tensor)
     std = gain * np.sqrt(1.0 / fan_in)
     return tensor.normal_(0, std)
+
+
+def orthogonal(tensor, gain=1):
+    if tensor.ndimension() < 2:
+        raise ValueError("Only tensors with 2 or more dimensions are supported.")
+
+    flattened_shape = (tensor.size(0), int(np.prod(tensor.numpy().shape[1:])))
+    flattened = torch.Tensor(flattened_shape[0], flattened_shape[1]).normal_(0, 1)
+
+    u, s, v = np.linalg.svd(flattened.numpy(), full_matrices=False)
+    if u.shape == flattened.numpy().shape:
+        tensor.view_as(flattened).copy_(torch.from_numpy(u))
+    else:
+        tensor.view_as(flattened).copy_(torch.from_numpy(v))
+
+    tensor.mul_(gain)
+    return tensor
 
 
 def sparse(tensor, sparsity, std=0.01):

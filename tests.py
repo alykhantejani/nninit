@@ -17,7 +17,7 @@ def _random_float(a, b):
 
 def _create_random_nd_tensor(dims, size_min, size_max):
     size = [randint(size_min, size_max) for _ in range(dims)]
-    return torch.from_numpy(np.ndarray(size)).zero_()
+    return torch.zeros(size)
 
 
 def _is_uniform(tensor, a, b):
@@ -186,3 +186,22 @@ def test_sparse_default_std(use_random_std):
         assert column[column == 0].nelement() >= np.ceil(sparsity * cols)
         assert _is_normal(column[column != 0], 0, std)
 
+
+@mark.parametrize("use_gain", [True, False])
+@mark.parametrize("tensor_size", [[3, 4], [4, 3], [20, 2, 3, 4], [2, 3, 4, 5]])
+def test_orthogonal(use_gain, tensor_size):
+    input_tensor = torch.zeros(tensor_size)
+    gain = 1.0
+
+    if use_gain:
+        gain = _random_float(0.1, 2)
+        nninit.orthogonal(input_tensor, gain=gain)
+    else:
+        nninit.orthogonal(input_tensor)
+
+    rows, cols = tensor_size[0], int(np.prod(tensor_size[1:]))
+    flattened_tensor = input_tensor.view(rows, cols).numpy()
+    if rows > cols:
+        assert np.allclose(np.dot(flattened_tensor.T, flattened_tensor), np.eye(cols) * gain**2, atol=1e-6)
+    else:
+        assert np.allclose(np.dot(flattened_tensor, flattened_tensor.T), np.eye(rows) * gain**2, atol=1e-6)
