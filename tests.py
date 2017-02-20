@@ -184,7 +184,7 @@ def test_sparse_default_std(use_random_std):
     for col_idx in range(input_tensor.size(1)):
         column = input_tensor[:, col_idx]
         assert column[column == 0].nelement() >= np.ceil(sparsity * cols)
-        
+
     assert _is_normal(input_tensor[input_tensor != 0], 0, std)
 
 
