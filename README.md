@@ -2,6 +2,29 @@
 
 Weight initialization schemes for PyTorch nn.Modules. This is a port of the popular [nninit](https://github.com/Kaixhin/nninit) for [Torch7](https://github.com/torch/torch7) by [@kaixhin](https://github.com/Kaixhin/).
 
+##Update
+
+This repo has been merged into [PyTorch's nn module](https://github.com/pytorch/pytorch/blob/master/torch/nn/init.py), I recommend you use that version going forward.
+
+###PyTorch Example
+##Usage
+```python
+import nninit
+from torch import nn
+import torch.nn.init as init
+import numpy as np
+
+class Net(nn.Module):
+  def __init__(self):
+     super(Net, self).__init__()
+     self.conv1 = nn.Conv2d(5, 10, (3, 3))
+     init.xavier_uniform(self.conv1.weight, gain=np.sqrt(2))
+     init.constant(self.conv1.bias, 0.1)
+
+network = Net()
+```
+
+
 
 ##Installation
 Clone the repo and run `python setup install`
