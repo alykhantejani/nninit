@@ -7,7 +7,6 @@ Weight initialization schemes for PyTorch nn.Modules. This is a port of the popu
 This repo has been merged into [PyTorch's nn module](https://github.com/pytorch/pytorch/blob/master/torch/nn/init.py), I recommend you use that version going forward.
 
 ###PyTorch Example
-##Usage
 ```python
 import nninit
 from torch import nn
